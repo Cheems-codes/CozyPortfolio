@@ -4,6 +4,33 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Custom chopstick cursors: idle by default, click cursor while the mouse is held. */
+html,
+body,
+#root {
+  cursor: url("/CozyPortfolio/cursors/ChopstickIdle.cur"), auto;
+}
+
+a,
+button,
+[role="button"],
+input,
+select,
+textarea {
+  cursor: url("/CozyPortfolio/cursors/ChopstickIdle.cur"), auto;
+}
+
+body:active,
+body:active *,
+body:active a,
+body:active button,
+body:active [role="button"],
+body:active input,
+body:active select,
+body:active textarea {
+  cursor: url("/CozyPortfolio/cursors/ChopstickClick.cur"), auto !important;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
