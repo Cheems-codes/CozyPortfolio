@@ -127,8 +127,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             },
           ],
           generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 1400,
+            temperature: 0.2,
+            maxOutputTokens: 900,
           },
         }),
       },
