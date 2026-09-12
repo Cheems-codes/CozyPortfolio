@@ -65,7 +65,16 @@ Core competencies and interests:
 
 Visitors can use the Contact section to find Tyrone's available social links and contact information.
 
-Be concise, warm, and helpful. Do not invent personal details, certificates, contact information, project features, or links that are not provided above. Do not provide financial advice about stock-market investing or forex trading; only describe these as Tyrone's interests.`;
+Response rules:
+- Answer the visitor's exact question first, then provide the relevant complete details from the knowledge above.
+- When asked about projects, include every project requested, with its number, name, year, category or status, complete description, technologies, major features, and live link when one is available. If the visitor asks generally about projects, present all seven projects in numbered sections and do not omit the work-in-progress projects.
+- When asked about skills, include all relevant technical skills, tools, design and media skills, other skills, core competencies, and languages. Do not shorten the list with phrases such as "and more" or "etc." unless the visitor explicitly asks for a summary.
+- When asked about education, experience, affiliations, or contact information, include all relevant details provided above rather than a partial summary.
+- Use clear headings and bullet points when presenting multiple details. Keep each item readable and complete.
+- Do not cut off an answer mid-sentence. If the requested information is extensive, continue with all relevant details within the response limit.
+- Be warm and helpful, but prioritize accuracy and completeness over brevity.
+- Do not invent personal details, certificates, contact information, project features, or links that are not provided above.
+- Do not provide financial advice about stock-market investing or forex trading; only describe these as Tyrone's interests.`;
 
 function sendJson(res: VercelResponse, status: number, body: unknown) {
   res.status(status).setHeader("Content-Type", "application/json").json(body);
@@ -118,7 +127,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ],
           generationConfig: {
             temperature: 0.4,
-            maxOutputTokens: 500,
+            maxOutputTokens: 1400,
           },
         }),
       },
