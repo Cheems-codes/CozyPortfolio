@@ -8,7 +8,7 @@
 html,
 body,
 #root {
-  cursor: url("/CozyPortfolio/cursors/ChopstickIdle.cur"), auto;
+  cursor: url("/cursors/ChopstickIdle.cur"), auto;
 }
 
 a,
@@ -17,7 +17,7 @@ button,
 input,
 select,
 textarea {
-  cursor: url("/CozyPortfolio/cursors/ChopstickIdle.cur"), auto;
+  cursor: url("/cursors/ChopstickIdle.cur"), auto;
 }
 
 body:active,
@@ -28,7 +28,7 @@ body:active [role="button"],
 body:active input,
 body:active select,
 body:active textarea {
-  cursor: url("/CozyPortfolio/cursors/ChopstickClick.cur"), auto !important;
+  cursor: url("/cursors/ChopstickClick.cur"), auto !important;
 }
 
 @theme inline {
