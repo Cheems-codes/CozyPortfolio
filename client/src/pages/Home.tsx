@@ -1,5 +1,5 @@
-import { useEffect, useState, type CSSProperties } from "react";
-import { ArrowUpRight, Check, Mail } from "lucide-react";
+import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
+import { ArrowUpRight, Check, Mail, MessageCircle, Send, X } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 type BentoId = "about" | "projects" | "services" | "certificates" | "contact";
@@ -77,6 +77,41 @@ function ThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   return <button type="button" className="theme-toggle" onClick={toggleTheme} aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`} aria-pressed={theme === "dark"}><span aria-hidden="true">{theme === "light" ? "☾" : "☀"}</span><b>{theme === "light" ? "dark" : "light"}</b></button>;
 }
+type ChatMessage = { role: "user" | "assistant"; text: string };
+function Chatbot() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    { role: "assistant", text: "Hi! I’m Tyrone’s portfolio assistant. Ask me about the projects, certificates, or this website." },
+  ]);
+  const sendMessage = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = message.trim();
+    if (!trimmed || isLoading) return;
+    setMessage("");
+    setMessages(current => [...current, { role: "user", text: trimmed }]);
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: trimmed }) });
+      const data = await response.json() as { answer?: string; error?: string };
+      if (!response.ok) throw new Error(data.error || "The chatbot could not respond right now.");
+      setMessages(current => [...current, { role: "assistant", text: data.answer || "I didn’t receive an answer. Please try again." }]);
+    } catch (error) {
+      setMessages(current => [...current, { role: "assistant", text: error instanceof Error ? error.message : "The chatbot could not respond right now." }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  return <div className="chatbot-shell">
+    {isOpen && <section className="chatbot-window" role="dialog" aria-label="Portfolio chatbot">
+      <div className="chatbot-header"><div><strong>Ask the Bento Bot</strong><span> Jarvis & Ultron · Portfolio Help</span></div><button type="button" className="chatbot-close" onClick={() => setIsOpen(false)} aria-label="Close chatbot"><X size={17} /></button></div>
+      <div className="chatbot-messages" aria-live="polite">{messages.map((item, index) => <div className={`chatbot-message ${item.role}`} key={`${item.role}-${index}`}>{item.text}</div>)}{isLoading && <div className="chatbot-message assistant chatbot-loading"><span /> <span /> <span /><b>thinking…</b></div>}</div>
+      <form className="chatbot-form" onSubmit={sendMessage}><input value={message} onChange={event => setMessage(event.target.value)} placeholder="Ask about the portfolio…" maxLength={2000} aria-label="Message for portfolio chatbot" disabled={isLoading} /><button type="submit" aria-label="Send message" disabled={isLoading || !message.trim()}><Send size={16} /></button></form>
+    </section>}
+    <button type="button" className={`chatbot-launcher ${isOpen ? "is-open" : ""}`} onClick={() => setIsOpen(current => !current)} aria-label={isOpen ? "Close portfolio chatbot" : "Open portfolio chatbot"} aria-expanded={isOpen}><MessageCircle size={20} /><span>{isOpen ? "close" : "ask me"}</span></button>
+  </div>;
+}
 function BentoCompartment({ item, activeId, hoveredId, onOpen, onHover }: { item: BentoItem; activeId: BentoId | null; hoveredId: BentoId | null; onOpen: (id: BentoId) => void; onHover: (id: BentoId | null) => void }) {
   const isActive = activeId === item.id;
   return <button type="button" className={`bento-compartment ${item.id}-compartment ${isActive ? "is-active" : ""}`} style={item.style} onMouseEnter={() => onHover(item.id)} onFocus={() => onHover(item.id)} onBlur={() => onHover(null)} onClick={() => onOpen(item.id)} aria-label={`Open ${item.title}`} aria-pressed={isActive}><span className="compartment-rim" /><FoodIllustration id={item.id} isHovered={hoveredId === item.id} /><span className="food-kanji" aria-hidden="true">{item.kanji}</span><Stamp item={item} /></button>;
@@ -130,5 +165,6 @@ export default function Home() {
     </button>
     <div className="bento-controls">{lidOpen && <button type="button" className="reset-bento" onClick={resetBento} aria-label="Put the lid back on the bento"><span>↺</span> put the lid back</button>}<ThemeToggle /></div>
     {visibleItem && <ContentBlock item={visibleItem} isClosing={closingId === visibleItem.id} onClose={closeCard} />}
+    <Chatbot />
   </div></main>;
 }
