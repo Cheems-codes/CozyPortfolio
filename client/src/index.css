@@ -611,5 +611,73 @@ body, .bento-canvas, .interaction-card, .certificate-card, .certificate-viewer-p
 .dark .chatbot-form input { border-color: #705446; background: #1e1917; color: #f4e7d8; }
 .dark .chatbot-launcher { border-color: #f0d8be; box-shadow: 4px 5px 0 #0d0b0a; }
 .dark .chatbot-launcher:active { box-shadow: 2px 3px 0 #0d0b0a; }
+
+/* General dark-mode contrast: keep portfolio text readable against dark surfaces. */
+.dark .site-nav .wordmark,
+.dark .site-nav .nav-links a,
+.dark .hero h1,
+.dark .hero-intro,
+.dark .scroll-cue,
+.dark .section-heading h2,
+.dark .section-aside,
+.dark .site-footer,
+.dark .site-footer a { color: #f8eadb; }
+.dark .kicker,
+.dark .section-heading .kicker,
+.dark .site-footer { color: #d8bda8; }
+.dark .interaction-card-top button { color: #e2c7b1; }
+.dark .interaction-card h2,
+.dark .contact-content h3,
+.dark .about-stats strong,
+.dark .about-entry strong,
+.dark .project-entry strong,
+.dark .service-grid strong,
+.dark .certificate-copy strong,
+.dark .certificate-placeholder strong,
+.dark .certificate-viewer-panel strong { color: #fff1df; }
+.dark .interaction-card p,
+.dark .about-section p,
+.dark .about-entry,
+.dark .about-entry ul,
+.dark .project-entry p,
+.dark .service-grid p,
+.dark .card-list.simple,
+.dark .contact-content a,
+.dark .contact-content span,
+.dark .about-contact a { color: #e2cdbb; }
+.dark .card-details span,
+.dark .about-stats span,
+.dark .about-entry small,
+.dark .certificate-copy small,
+.dark .certificate-placeholder small,
+.dark .certificate-viewer-panel small,
+.dark .certificate-image-placeholder,
+.dark .certificate-image-placeholder small,
+.dark .certificate-holder-placeholder,
+.dark .certificate-holder-placeholder small { color: #d2b39c; }
+.dark .about-section > b,
+.dark .card-details b,
+.dark .project-entry > b,
+.dark .service-grid b,
+.dark .contact-content b,
+.dark .certificate-number { color: #f0c77b; }
+.dark .about-entry span,
+.dark .project-entry > span { color: #c8e08a; }
+.dark .project-entry a,
+.dark .contact-content a:hover,
+.dark .about-contact a:hover { color: #ff9f9b; }
+.dark .certificate-filters button,
+.dark .certificate-card,
+.dark .certificate-placeholder,
+.dark .card-pills span { color: #f3ddc9; }
+.dark .certificate-card,
+.dark .certificate-placeholder { background: rgba(67, 51, 43, .92); }
+.dark .card-list.simple,
+.dark .detail-grid,
+.dark .about-entry,
+.dark .project-grid,
+.dark .contact-columns { border-color: #695044; }
+.dark .about-entry li::before { color: #f4c85f; }
+.dark .sticky-note { color: #302521; }
 @media (max-width: 700px) { .chatbot-shell { right: 16px; bottom: 16px; } .chatbot-window { height: min(500px, calc(100vh - 125px)); } .chatbot-launcher { padding: 11px 13px; } }
 @media (max-width: 700px) { .bento-controls { top: 14px; right: 14px; } }
