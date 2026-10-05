@@ -82,6 +82,10 @@ function sendJson(res: VercelResponse, status: number, body: unknown) {
   res.status(status).setHeader("Content-Type", "application/json").json(body);
 }
 
+function wait(milliseconds: number) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "OPTIONS") {
     res.setHeader("Allow", "POST, OPTIONS");
@@ -119,35 +123,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: portfolioInstructions }],
+    const requestUrl =
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system_instruction: {
+          parts: [{ text: portfolioInstructions }],
+        },
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: message }],
           },
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: message }],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 1400,
-          },
-        }),
-      },
-    );
+        ],
+        generationConfig: {
+          temperature: 0.4,
+          maxOutputTokens: 1400,
+        },
+      }),
+    };
+
+    let geminiResponse: Response;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      geminiResponse = await fetch(requestUrl, requestOptions);
+      if (geminiResponse.ok || (geminiResponse.status !== 503 && geminiResponse.status !== 429)) {
+        break;
+      }
+      await wait(500 * (attempt + 1));
+    }
 
     if (!geminiResponse.ok) {
       const errorText = await geminiResponse.text();
       console.error("Gemini API error:", geminiResponse.status, errorText);
-      return sendJson(res, 502, {
-        error: `Gemini request failed with status ${geminiResponse.status}. Check the GEMINI_API_KEY, GEMINI_MODEL, and Vercel Runtime Logs.`,
-      });
+      const publicError = geminiResponse.status === 503
+        ? "Gemini is temporarily unavailable. Please try again in a few seconds."
+        : geminiResponse.status === 429
+          ? "Gemini is temporarily busy or rate-limited. Please try again shortly."
+          : `Gemini request failed with status ${geminiResponse.status}. Check the Gemini key, model, and Vercel Runtime Logs.`;
+      return sendJson(res, 502, { error: publicError });
     }
 
     const data = (await geminiResponse.json()) as {
