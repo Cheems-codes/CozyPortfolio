@@ -423,7 +423,11 @@ body::before { opacity: .9; }
 @media (prefers-reduced-motion: reduce) { .card-scrim { animation: none; } }
 
 /* About card content from Tyrone's supplied profile PDF. */
-.interaction-card { overflow-y: auto; scrollbar-width: thin; scrollbar-color: #d7bda4 transparent; }
+.interaction-card { overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #d7bda4 transparent; }
+.interaction-card::-webkit-scrollbar { width: 10px; }
+.interaction-card::-webkit-scrollbar-track { margin: 12px 4px; border-radius: 99px; background: transparent; }
+.interaction-card::-webkit-scrollbar-thumb { min-height: 42px; border: 3px solid transparent; border-radius: 99px; background: #d7bda4; background-clip: padding-box; }
+.interaction-card::-webkit-scrollbar-thumb:hover { background: #b99578; background-clip: padding-box; }
 .about-card { justify-content: flex-start; }
 .about-card h2 { max-width: 900px; font-size: clamp(48px, 6vw, 88px); line-height: .92; }
 .about-content { max-width: 900px; padding-bottom: 10px; }
@@ -679,5 +683,8 @@ body, .bento-canvas, .interaction-card, .certificate-card, .certificate-viewer-p
 .dark .contact-columns { border-color: #695044; }
 .dark .about-entry li::before { color: #f4c85f; }
 .dark .sticky-note { color: #302521; }
+.dark .interaction-card { scrollbar-color: #8f6d59 transparent; }
+.dark .interaction-card::-webkit-scrollbar-thumb { background: #8f6d59; background-clip: padding-box; }
+.dark .interaction-card::-webkit-scrollbar-thumb:hover { background: #c49a78; background-clip: padding-box; }
 @media (max-width: 700px) { .chatbot-shell { right: 16px; bottom: 16px; } .chatbot-window { height: min(500px, calc(100vh - 125px)); } .chatbot-launcher { padding: 11px 13px; } }
 @media (max-width: 700px) { .bento-controls { top: 14px; right: 14px; } }
