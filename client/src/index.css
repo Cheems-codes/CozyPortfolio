@@ -454,8 +454,9 @@ body::before { opacity: .9; }
 
 /* Keep the yellow eyebrow clear of the About card title. */
 .about-card { padding-top: clamp(102px, 12vh, 138px); }
-.about-entry ul { display: grid; gap: 7px; margin: 5px 0 0; padding-left: 18px; color: #6c5c51; font-size: 12px; line-height: 1.5; }
-.about-entry li::marker { color: #d9a22e; }
+.about-entry ul { display: grid; gap: 7px; margin: 5px 0 0; padding-left: 0; color: #6c5c51; font-size: 12px; line-height: 1.5; list-style: none; }
+.about-entry li { position: relative; padding-left: 14px; }
+.about-entry li::before { position: absolute; left: 0; content: "–"; color: #d9a22e; font-weight: 700; }
 @media (max-width: 700px) {
   .about-card { padding-top: 90px; }
   .about-entry ul { gap: 6px; padding-left: 16px; font-size: 11px; line-height: 1.45; }
