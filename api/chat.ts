@@ -103,6 +103,33 @@ function wait(milliseconds: number) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+const jpcsPositionsFallback = `Tyrone has held two positions in the Junior Philippine Computer Society PCU Manila Chapter:
+
+1. Secretary — 2026–Present
+- Make annual reports on the activities, plans, and accomplishments of the Junior Philippine Computer Society PCU Manila Chapter, certified by the President and submitted to the JPCS National Board of Directors.
+- Keep and preserve accurate, permanent written records of all Junior Philippine Computer Society PCU Manila Chapter meetings, member records, and other papers regarding chapter activities.
+- Be responsible for all correspondence of the Junior Philippine Computer Society PCU Manila Chapter.
+- Be responsible for notices of organizational meetings and correspondence related to the Secretary's office.
+- Serve meeting notices to officers and duplicate and distribute meeting minutes.
+- Submit all Junior Philippine Computer Society PCU Manila Chapter meeting minutes by email to the Executive Committee.
+- Act as historian of all activities of the Junior Philippine Computer Society PCU Manila Chapter during the term of the Executive Committee.
+- Perform other duties delegated by the President or the JPCS National Board of Directors.
+
+2. Auditor — 2025–2026
+- Submit financial reports for each JPCS project to the committee within one week of completion.
+- Conduct regular audits of organizational financial records to ensure accuracy and transparency.
+- Recommend improvements to financial practices and strengthen internal controls.
+- Report financial discrepancies or concerns to the organization's leadership.
+- Maintain independence and impartiality from financial management processes.
+- Perform additional duties assigned by the President or JPCS National Board of Directors.`;
+
+function getFallbackAnswer(message: string) {
+  const normalizedMessage = message.toLowerCase();
+  const asksAboutJpcsPositions = normalizedMessage.includes("jpcs") &&
+    (normalizedMessage.includes("position") || normalizedMessage.includes("role") || normalizedMessage.includes("secretary") || normalizedMessage.includes("auditor"));
+  return asksAboutJpcsPositions ? jpcsPositionsFallback : null;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "OPTIONS") {
     res.setHeader("Allow", "POST, OPTIONS");
@@ -174,6 +201,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!geminiResponse.ok) {
       const errorText = await geminiResponse.text();
       console.error("Gemini API error:", geminiResponse.status, errorText);
+      const fallbackAnswer = getFallbackAnswer(message);
+      if (fallbackAnswer && (geminiResponse.status === 503 || geminiResponse.status === 429)) {
+        return sendJson(res, 200, { answer: fallbackAnswer });
+      }
       const publicError = geminiResponse.status === 503
         ? "Gemini is temporarily unavailable. Please try again in a few seconds."
         : geminiResponse.status === 429
