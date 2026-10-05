@@ -1,9 +1,9 @@
-const GEMINI_MODEL = "gemini-3.6-flash";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 const MAX_MESSAGE_LENGTH = 2000;
 
 type VercelRequest = {
   method?: string;
-  body?: { message?: unknown };
+  body?: { message?: unknown } | string;
 };
 
 type VercelResponse = {
@@ -46,22 +46,7 @@ Portfolio and project information:
 - Project 07 — Woord is a 2026 gamified-education project in progress. It is an interactive web-based game that teaches etymology through the mechanics of a crafting-survival game.
 
 Affiliations and experience:
-- Junior Philippine Computer Society — Secretary, 2026–Present. Tyrone was promoted to Secretary after serving as Auditor. Responsibilities:
-  - Make annual reports on the activities, plans, and accomplishments of JPCS-PCU Manila Chapter, certified by the President and submitted to the JPCS National Board of Directors.
-  - Keep and preserve accurate, permanent written records of all JPCS-PCU Manila Chapter meetings, member records, and other papers regarding chapter activities.
-  - Be responsible for all correspondence of JPCS-PCU Manila Chapter.
-  - Be responsible for notices of organizational meetings and correspondence related to the office.
-  - Serve meeting notices to officers and duplicate and distribute meeting minutes.
-  - Submit all JPCS meeting minutes by email to the Executive Committee.
-  - Act as historian of all organization activities during the term of the Executive Committee.
-  - Perform other duties delegated by the President or the JPCS National Board of Directors.
-- Junior Philippine Computer Society — Auditor, 2025–2026. Tyrone oversaw financial transparency and accurate reporting of organizational funds and projects. Responsibilities:
-  - Submit financial reports for each JPCS project to the committee within one week of completion.
-  - Conduct regular audits of organizational financial records to ensure accuracy and transparency.
-  - Recommend improvements to financial practices and strengthen internal controls.
-  - Report financial discrepancies or concerns to the organization's leadership.
-  - Maintain independence and impartiality from financial management processes.
-  - Perform additional duties assigned by the President or JPCS National Board of Directors.
+- Junior Philippine Computer Society — Auditor, 2025–Present. Tyrone oversees financial transparency and accurate reporting of organizational funds and projects. His responsibilities include submitting project financial reports within one week of completion, auditing financial records, recommending improvements to financial practices and internal controls, reporting discrepancies to leadership, maintaining independence and impartiality, and performing duties assigned by the President or JPCS National Board of Directors.
 - PsychoShopping — Graphic Designer, 2019–2023. Tyrone created visual materials for branding, marketing, and online content, including social-media graphics, promotional materials, digital campaigns, posters, banners, and marketing layouts. He edited images, layouts, and typography while following brand guidelines.
 - PsychoShopping — Social Media Manager, 2019–2023. Tyrone developed social-media strategies, created and scheduled daily videos, photos, and captions, planned content calendars and campaigns, engaged audiences, analyzed performance metrics, monitored trends, maintained brand consistency, and managed online reputation.
 
@@ -114,7 +99,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return sendJson(res, 500, { error: "Chatbot is not configured yet." });
   }
 
-  const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
+  let requestBody: { message?: unknown } = {};
+  try {
+    requestBody = typeof req.body === "string" ? JSON.parse(req.body) : (req.body ?? {});
+  } catch {
+    return sendJson(res, 400, { error: "Invalid JSON request body." });
+  }
+
+  const message = typeof requestBody.message === "string" ? requestBody.message.trim() : "";
 
   if (!message) {
     return sendJson(res, 400, { error: "Please enter a message." });
@@ -153,7 +145,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!geminiResponse.ok) {
       const errorText = await geminiResponse.text();
       console.error("Gemini API error:", geminiResponse.status, errorText);
-      return sendJson(res, 502, { error: "The chatbot could not respond right now." });
+      return sendJson(res, 502, {
+        error: `Gemini request failed with status ${geminiResponse.status}. Check the GEMINI_API_KEY, GEMINI_MODEL, and Vercel Runtime Logs.`,
+      });
     }
 
     const data = (await geminiResponse.json()) as {
@@ -172,6 +166,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return sendJson(res, 200, { answer });
   } catch (error) {
     console.error("Chatbot request failed:", error);
-    return sendJson(res, 500, { error: "The chatbot could not respond right now." });
+    return sendJson(res, 500, {
+      error: "The chatbot could not connect to Gemini. Check the Vercel Runtime Logs and environment variables.",
+    });
   }
 }
